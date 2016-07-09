@@ -1,0 +1,20 @@
+1) Crime ID			(..)
+2) Month			(..)
+3) Reported by		(..)
+4) Falls within		(..)
+5) Longitude		(..)
+6) Latitude			(..)
+7) Location			(..)
+8) LSOA code		(..)
+9) LSOA name		(..)
+10) Outcome type	(
+	Action to be taken by another organisation
+	Formal action is not in the public interest
+	Investigation complete; no suspect identified
+	Local resolution
+	Offender given a caution
+	Offender given penalty notice
+	Suspect charged
+	Suspect charged as part of another case
+	Unable to prosecute suspect
+)

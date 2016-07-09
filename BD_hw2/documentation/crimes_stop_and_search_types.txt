@@ -1,0 +1,52 @@
+1) Type 									(Person and Vehicle search Person search Vehicle search)
+2) Date 									(..)
+3) Part of a policing operation 			(true false)
+4) Policing operation			 			(NOT STATED OPTIMAL SWEETEND TITAN VIPER)
+5) Latitude 								(..)
+6) Longitude 								(..)
+7) Gender 									(Male Female " ")
+8) Age range 								(under 10 10-17 18-24 25-34 over 34)
+9) Self-defined ethnicity ( 
+	Asian or Asian British - Any other Asian ethnic background (A9)
+	Asian or Asian British - Bangladeshi (A3)
+	Asian or Asian British - Indian (A1)
+	Asian or Asian British - Pakistani (A2)
+	Black or Black British - African (B2)
+	Black or Black British - Any other Black ethnic background (B9)
+	Black or Black British - Caribbean (B1)
+	Chinese or other ethnic group - Any other ethnic group (O9)
+	Mixed - Any other Mixed ethnic background (M9)
+	Mixed - White and Asian (M3)
+	Mixed - White and Black African (M2)
+	Mixed - White and Black Caribbean (M1)
+	Not Stated (NS)
+	White - Any other White ethnic background (W9)
+	White - White British (W1)
+	White - White Irish (W2)
+)
+10) Officer-defined ethnicity (
+	Asian
+	Black
+	Other
+	White
+)
+11) Legislation 								(varie....section #)
+12) Object of search (
+	Article for use in theft
+	Articles for use in criminal damage
+	Controlled drugs
+	Firearms
+	Offensive weapons
+	Stolen goods
+)
+13) Outcome (
+	Local resolution
+	Nothing found - no further action
+	Offender cautioned
+	Offender given drugs possession warning
+	Offender given penalty notice
+	Suspect arrested
+	Suspect summonsed to court
+	)
+14) Outcome linked to object of search 			(False True)
+15) Removal of more than just outer clothing 	(True False)

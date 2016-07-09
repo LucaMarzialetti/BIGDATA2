@@ -1,0 +1,11 @@
+1) PCD7			- post code						
+2) PCD8			- post code 					
+3) OA11CD		- oa code							
+4) LSOA11CD		- lsoa code							
+5) LSOA11NM 	- lsoa name							
+6) MSOA11CD 	- msoa code							
+7) MSOA11NM 	- msoa name							
+8) LAD11CD		- local auth code					
+9) LAD11NM 		- local auth name					
+10) LAD11NMW	- local auth name gallese			
+11) PCDOASPLT	- indicatore post code

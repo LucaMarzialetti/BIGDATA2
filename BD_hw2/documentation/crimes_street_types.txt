@@ -1,0 +1,40 @@
+1) Crime ID 				(..)
+2) Month					(..)
+3) Reported by				(..)
+4) Falls within				(..)
+5) Longitude				(..)
+6) Latitude					(..)
+7) Location					(https://data.police.uk/about/#location-anonymisation)
+8) LSOA code				(..)
+9) LSOA name				(..)
+10) Crime type				(
+	Anti-social behaviour
+	Bicycle theft
+	Burglary
+	Criminal damage and arson
+	Drugs
+	Other crime
+	Other theft
+	Possession of weapons
+	Public order
+	Robbery
+	Shoplifting
+	Theft from the person
+	Vehicle crime
+	Violent crime
+	Violence and sexual offences
+)
+11) Last outcome category (
+	Action to be taken by another organisation
+	Awaiting court outcome
+	Formal action is not in the public interest
+	Investigation complete; no suspect identified
+	Local resolution
+	Offender given a caution
+	Offender given a drugs possession warning
+	Offender given penalty notice
+	Suspect charged as part of another case
+	Unable to prosecute suspect
+	Under investigation
+)
+12) Context					(sempre vuoto ^_^' )

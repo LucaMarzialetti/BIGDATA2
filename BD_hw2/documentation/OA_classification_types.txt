@@ -1,0 +1,142 @@
+1) Output Area Code			(code)
+2) Local Authority Code 	(code)
+3) Local Authority Name    	(name ~ 400)
+4) Region/Country Code     	(code)
+5) Region/Country Name      (
+	East
+	East Midlands
+	London
+	North East
+	North West
+	Northern Ireland
+	Scotland
+	South East
+	South West
+	Wales
+	West Midlands
+	Yorkshire and The Humber
+)
+6) Supergroup code 			(code)
+7) Supergroup Name 			(name)
+8) Group Code 				(code)
+9) Group Name 				(name)
+10) Subgroup Code 			(code)
+11) Subgroup Name 			(name)
+
+SupG1) Constrained City Dwellers
+	G1.1) Ageing City Dwellers
+		Constrained City Dwellers Ageing City Dwellers Ageing Communities and Families
+		Constrained City Dwellers Ageing City Dwellers Retired City Hardship
+		Constrained City Dwellers Ageing City Dwellers Retired Communal City Dwellers
+		Constrained City Dwellers Ageing City Dwellers Retired Independent City Dwellers
+	G1.2) Challenged Diversity
+		Constrained City Dwellers Challenged Diversity Hampered Aspiration
+		Constrained City Dwellers Challenged Diversity Multi-Ethnic Hardship
+		Constrained City Dwellers Challenged Diversity Transitional Eastern European Neighbourhoods
+	G1.3) Constrained Flat Dwellers
+		Constrained City Dwellers Constrained Flat Dwellers Deprived Neighbourhoods
+		Constrained City Dwellers Constrained Flat Dwellers Eastern European Communities
+		Constrained City Dwellers Constrained Flat Dwellers Endeavouring Flat Dwellers
+	G1.4) White Communities Communities
+		Constrained City Dwellers White Communities Challenged Transitionaries
+		Constrained City Dwellers White Communities Constrained Young Families
+		Constrained City Dwellers White Communities Outer City Hardship
+
+SupG2) Cosmopolitans
+	G2.1) Aspiring and Affluent
+		Cosmopolitans Aspiring and Affluent EU White-Collar Workers
+		Cosmopolitans Aspiring and Affluent Highly-Qualified Quaternary Workers
+		Cosmopolitans Aspiring and Affluent Urban Cultural Mix
+	G2.2) Comfortable Cosmopolitans
+		Cosmopolitans Comfortable Cosmopolitans Migrant Commuters
+		Cosmopolitans Comfortable Cosmopolitans Migrant Families
+		Cosmopolitans Comfortable Cosmopolitans Professional Service Cosmopolitans
+	G2.3) Inner-City Students
+		Cosmopolitans Inner-City Students Multicultural Student Neighbourhoods
+		Cosmopolitans Inner-City Students Students and Commuters
+	G2.4) Students Around Campus
+		Cosmopolitans Students Around Campus Student Communal Living
+		Cosmopolitans Students Around Campus Student Digs
+		Cosmopolitans Students Around Campus Students and Professionals
+
+SupG3) Ethnicity Central
+	G3.1) Aspirational Techies
+		Ethnicity Central Aspirational Techies Established Tech Workers
+		Ethnicity Central Aspirational Techies New EU Tech Workers
+		Ethnicity Central Aspirational Techies Old EU Tech Workers
+	G3.2) Endeavouring Ethnic Mix
+		Ethnicity Central Endeavouring Ethnic Mix Bangladeshi Mixed Employment
+		Ethnicity Central Endeavouring Ethnic Mix Multi-Ethnic Professional Service Workers
+		Ethnicity Central Endeavouring Ethnic Mix Striving Service Workers
+	G3.3) Ethnic Dynamics
+		Ethnicity Central Ethnic Dynamics Constrained Commuters
+		Ethnicity Central Ethnic Dynamics Constrained Neighbourhoods
+	G3.4) Ethnic Family Life	
+		Ethnicity Central Ethnic Family Life Established Renting Families
+		Ethnicity Central Ethnic Family Life Young Families and Students
+
+SupG4) Hard-Pressed Living
+	G4.1) Challenged Terraced Workers
+		Hard-Pressed Living Challenged Terraced Workers Deprived Blue-Collar Terraces
+		Hard-Pressed Living Challenged Terraced Workers Hard-Pressed Rented Terraces
+	G4.2) Hard-Pressed Ageing Workers
+		Hard-Pressed Living Hard-Pressed Ageing Workers Ageing Industrious Workers
+		Hard-Pressed Living Hard-Pressed Ageing Workers Ageing Rural Industry Workers
+		Hard-Pressed Living Hard-Pressed Ageing Workers Renting Hard-Pressed Workers
+	G4.3) Industrious Communities
+		Hard-Pressed Living Industrious Communities Industrious Hardship
+		Hard-Pressed Living Industrious Communities Industrious Transitions
+	G4.4) Migration and Churn
+		Hard-Pressed Living Migration and Churn Hard-Pressed Ethnic Mix
+		Hard-Pressed Living Migration and Churn Hard-Pressed European Settlers
+		Hard-Pressed Living Migration and Churn Young Hard-Pressed Families
+
+SupG5) Multicultural Metropolitans
+	G5.1) Asian Traits
+		Multicultural Metropolitans Asian Traits Achieving Minorities
+		Multicultural Metropolitans Asian Traits Inner City Ethnic Mix
+		Multicultural Metropolitans Asian Traits Multicultural New Arrivals
+	G5.2) Challenged Asian Terraces
+		Multicultural Metropolitans Challenged Asian Terraces Asian Terraces and Flats
+		Multicultural Metropolitans Challenged Asian Terraces Pakistani Communities
+	G5.3) Rented Family Living
+		Multicultural Metropolitans Rented Family Living Commuters with Young Families
+		Multicultural Metropolitans Rented Family Living Private Renting New Arrivals
+		Multicultural Metropolitans Rented Family Living Social Renting Young Families
+
+SupG6) Rural Residents
+	G6.1) Ageing Rural Dwellers
+		Rural Residents Ageing Rural Dwellers Detached Rural Retirement
+		Rural Residents Ageing Rural Dwellers Renting Rural Retirement
+		Rural Residents Ageing Rural Dwellers Rural Employment and Retirees
+	G6.2) Farming Communities
+		Rural Residents Farming Communities Agricultural Communities
+		Rural Residents Farming Communities Established Farming Communities
+		Rural Residents Farming Communities Older Farming Communities
+		Rural Residents Farming Communities Rural Workers and Families
+	G6.3) Rural Tenants
+		Rural Residents Rural Tenants Ageing Rural Flat Tenants
+		Rural Residents Rural Tenants Rural Life
+		Rural Residents Rural Tenants Rural White-Collar Workers
+
+SupG7) Suburbanites
+	G7.1) Semi-Detached Suburbia
+		Suburbanites Semi-Detached Suburbia Multi-Ethnic Suburbia
+		Suburbanites Semi-Detached Suburbia Older Workers and Retirement
+		Suburbanites Semi-Detached Suburbia Semi-Detached Ageing
+		Suburbanites Semi-Detached Suburbia White Suburban Communities
+	G7.2) Suburban Achievers
+		Suburbanites Suburban Achievers Ageing in Suburbia
+		Suburbanites Suburban Achievers Comfortable Suburbia
+		Suburbanites Suburban Achievers Detached Retirement Living
+		Suburbanites Suburban Achievers Indian Tech Achievers
+
+SupG8) Urbanites
+	G8.1) Ageing Urban
+		Urbanites Ageing Urban Living Communal Retirement
+		Urbanites Ageing Urban Living Delayed Retirement
+		Urbanites Ageing Urban Living Self-Sufficient Retirement
+	G8.2) Urban Professionals and Families
+		Urbanites Urban Professionals and Families Families in Terraces and Flats 
+		Urbanites Urban Professionals and Families Multi-Ethnic Professionals with Families
+		Urbanites Urban Professionals and Families White Professionals
