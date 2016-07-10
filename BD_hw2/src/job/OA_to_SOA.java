@@ -117,7 +117,7 @@ public class OA_to_SOA {
 					}
 				}).distinct();
 		/**fa il join sulla chiave**/
-		// join <String, Tuple10<String>>
+		// join <String, Tuple10<String>> JOIN SU CHIAVE OA
 		JavaPairRDD<String, Tuple10<String, String, String, String, String, String, String, String, String, String>> joined;
 		joined = OA_class_couples.join(OA_to_SOA_couples).mapToPair(new PairFunction<Tuple2<String,Tuple2<Tuple8<String,String,String,String,String,String,String,String>,Tuple2<String,String>>>, String, Tuple10<String, String, String, String, String, String, String, String, String, String>>() {
 			@Override
@@ -132,7 +132,7 @@ public class OA_to_SOA {
 			}
 		});
 		//remove others
-		//<String,Tuple3<String>> senza info sui gruppi
+		//<String,Tuple3<String>> senza info sui gruppi NUOVA CHIAVE LSOA
 		JavaPairRDD<String, Tuple3<String,String,String>> invarianti;
 		invarianti = joined.mapToPair(new PairFunction<Tuple2<String,Tuple10<String,String,String,String,String,String,String,String,String,String>>, String, Tuple3<String,String,String>>() {
 			@Override
