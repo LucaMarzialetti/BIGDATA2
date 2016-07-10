@@ -11,8 +11,10 @@ import org.apache.spark.api.java.function.PairFunction;
 
 import scala.Tuple10;
 import scala.Tuple2;
+import scala.Tuple3;
 import scala.Tuple4;
 import scala.Tuple5;
+import scala.Tuple6;
 import scala.Tuple8;
 
 public class OA_to_SOA {
@@ -57,7 +59,8 @@ public class OA_to_SOA {
 		//load data
 		JavaRDD<String> OA_class_text = loadData(path_to_dataset1);
 		JavaRDD<String> OA_to_SOA_text = loadData(path_to_dataset2);
-		// mappa il OA_class in <String,String>
+		/**MAPPING**/
+		// mappa OA_class in <String,Tuple8<String>>
 		JavaPairRDD<String,Tuple8<String, String, String, String, String, String, String, String>> OA_class_couples;
 		OA_class_couples = OA_class_text.mapToPair(
 				new PairFunction <String, String, Tuple8<String, String, String, String, String, String, String, String>>() {
@@ -82,7 +85,7 @@ public class OA_to_SOA {
 						return tupla;
 					}
 				});
-		// mappa il OA_to_SOA in <String,String>
+		// mappa OA_to_SOA in <String,Tuple2<String>> DISTINTE
 		JavaPairRDD<String,Tuple2<String, String>> OA_to_SOA_couples;
 		OA_to_SOA_couples = OA_to_SOA_text.mapToPair(
 				new PairFunction <String, String, Tuple2<String,String>>() {
@@ -114,6 +117,7 @@ public class OA_to_SOA {
 					}
 				}).distinct();
 		/**fa il join sulla chiave**/
+		// join <String, Tuple10<String>>
 		JavaPairRDD<String, Tuple10<String, String, String, String, String, String, String, String, String, String>> joined;
 		joined = OA_class_couples.join(OA_to_SOA_couples).mapToPair(new PairFunction<Tuple2<String,Tuple2<Tuple8<String,String,String,String,String,String,String,String>,Tuple2<String,String>>>, String, Tuple10<String, String, String, String, String, String, String, String, String, String>>() {
 			@Override
@@ -128,85 +132,130 @@ public class OA_to_SOA {
 			}
 		});
 		//remove others
-		JavaPairRDD<String, Tuple4<String,String,String,String>> invarianti;
-		invarianti = joined.mapToPair(new PairFunction<Tuple2<String,Tuple10<String,String,String,String,String,String,String,String,String,String>>, String, Tuple4<String,String,String,String>>() {
+		//<String,Tuple3<String>> senza info sui gruppi
+		JavaPairRDD<String, Tuple3<String,String,String>> invarianti;
+		invarianti = joined.mapToPair(new PairFunction<Tuple2<String,Tuple10<String,String,String,String,String,String,String,String,String,String>>, String, Tuple3<String,String,String>>() {
 			@Override
-			public Tuple2<String, Tuple4<String, String, String, String>> call(
+			public Tuple2<String, Tuple3<String, String, String>> call(
 					Tuple2<String, Tuple10<String, String, String, String, String, String, String, String, String, String>> t)
-					throws Exception {
-				String k = t._1;
-				Tuple4<String, String, String, String> v = new Tuple4<String, String, String, String>(t._2._1(), t._2._2(), t._2._9(), t._2._10());
-				return new Tuple2<String, Tuple4<String,String,String,String>>(k, v);
+							throws Exception {
+				String k = t._2._9();
+				Tuple3<String, String, String> v = new Tuple3<String, String, String>(t._2._10(),t._2._1(), t._2._2());
+				return new Tuple2<String, Tuple3<String,String,String>>(k, v);
 			}
 		});
 
 		/***CALCULTATING GROUPINGS***/
-		//super groups for OA
-		JavaPairRDD<Tuple2<String, String>, String> oa_SG;
+		//super groups for OA <Tuple2<String>,String> <<oa,supergroup_code>,super_group_name>
+		JavaPairRDD<Tuple2<String, String>, Iterable<String>> oa_SG;
 		oa_SG = joined.mapToPair(new PairFunction<Tuple2<String,Tuple10<String,String,String,String,String,String,String,String,String,String>>, Tuple2<String, String>, String>() {
 			@Override
 			public Tuple2<Tuple2<String, String>, String> call(
 					Tuple2<String, Tuple10<String, String, String, String, String, String, String, String, String, String>> t)
 							throws Exception {
-				Tuple2<String, String> k = new Tuple2<String, String>(t._1(), t._2._3()); 
+				Tuple2<String, String> k = new Tuple2<String, String>(t._2._9(), t._2._3()); 
 				String v = t._2._4();
 				return new Tuple2<Tuple2<String,String>, String>(k,v);
 			}
-		});
-		//groups for OA
-		JavaPairRDD<Tuple2<String, String>, String> oa_G;
+		}).groupByKey();
+		//groups for OA <Tuple2<String>,String> <<oa,group_code>,group_name>
+		JavaPairRDD<Tuple2<String, String>, Iterable<String>> oa_G;
 		oa_G = joined.mapToPair(new PairFunction<Tuple2<String,Tuple10<String,String,String,String,String,String,String,String,String,String>>, Tuple2<String, String>, String>() {
 			@Override
 			public Tuple2<Tuple2<String, String>, String> call(
 					Tuple2<String, Tuple10<String, String, String, String, String, String, String, String, String, String>> t)
 							throws Exception {
-				Tuple2<String, String> k = new Tuple2<String, String>(t._1(), t._2._5()); 
+				Tuple2<String, String> k = new Tuple2<String, String>(t._2._9(), t._2._5()); 
 				String v = t._2._6();
 				return new Tuple2<Tuple2<String,String>, String>(k,v);
 			}
-		});
-		//sub groups for OA
-		JavaPairRDD<Tuple2<String, String>, String> oa_SubG;
+		}).groupByKey();;
+		//sub groups for OA <Tuple2<String>,String> <<oa,subgroup_code>,subgroup_name>
+		JavaPairRDD<Tuple2<String, String>, Iterable<String>> oa_SubG;
 		oa_SubG = joined.mapToPair(new PairFunction<Tuple2<String,Tuple10<String,String,String,String,String,String,String,String,String,String>>, Tuple2<String, String>, String>() {
 			@Override
 			public Tuple2<Tuple2<String, String>, String> call(
 					Tuple2<String, Tuple10<String, String, String, String, String, String, String, String, String, String>> t)
 							throws Exception {
-				Tuple2<String, String> k = new Tuple2<String, String>(t._1(), t._2._7()); 
+				Tuple2<String, String> k = new Tuple2<String, String>(t._2._9(), t._2._7()); 
 				String v = t._2._8();
 				return new Tuple2<Tuple2<String,String>, String>(k,v);
 			}
-		});
+		}).groupByKey();;
 		/**PROJECTION**/
-		//super groups
-		JavaPairRDD<String, String> SG;
-		SG = oa_SG.mapToPair(new PairFunction<Tuple2<Tuple2<String,String>,String>, String, String>() {
+		//super groups <Stirng,String> OA,supergroup_name
+		JavaPairRDD<String, Iterable<String>> SG;
+		SG = oa_SG.mapToPair(new PairFunction<Tuple2<Tuple2<String,String>,Iterable<String>>, String, Iterable<String>>() {
+
 			@Override
-			public Tuple2<String, String> call(Tuple2<Tuple2<String, String>, String> t) throws Exception {
-				return new Tuple2<String, String>(t._1._1, t._2);
+			public Tuple2<String, Iterable<String>> call(Tuple2<Tuple2<String, String>, Iterable<String>> t)
+					throws Exception {
+				String k = t._1._1;
+				Iterable<String> v = t._2;
+				return new Tuple2<String, Iterable<String>>(k, v);
 			}
 		});
-		//groups
-		JavaPairRDD<String, String> G;
-		G = oa_G.mapToPair(new PairFunction<Tuple2<Tuple2<String,String>,String>, String, String>() {
+		//groups <Stirng,String> OA,group_name
+		JavaPairRDD<String, Iterable<String>> G;
+		G = oa_G.mapToPair(new PairFunction<Tuple2<Tuple2<String,String>,Iterable<String>>, String, Iterable<String>>() {
+
 			@Override
-			public Tuple2<String, String> call(Tuple2<Tuple2<String, String>, String> t) throws Exception {
-				return new Tuple2<String, String>(t._1._1, t._2);
+			public Tuple2<String, Iterable<String>> call(Tuple2<Tuple2<String, String>, Iterable<String>> t)
+					throws Exception {
+				String k = t._1._1;
+				Iterable<String> v = t._2;
+				return new Tuple2<String, Iterable<String>>(k, v);
 			}
 		});
-		//sub groups
-		JavaPairRDD<String, String> SubG;
-		SubG = oa_SubG.mapToPair(new PairFunction<Tuple2<Tuple2<String,String>,String>, String, String>() {
+		//sub groups <Stirng,String> OA,subgroup_name
+		JavaPairRDD<String, Iterable<String>> SubG;
+		SubG = oa_SubG.mapToPair(new PairFunction<Tuple2<Tuple2<String,String>,Iterable<String>>, String, Iterable<String>>() {
+
 			@Override
-			public Tuple2<String, String> call(Tuple2<Tuple2<String, String>, String> t) throws Exception {
-				return new Tuple2<String, String>(t._1._1, t._2);
+			public Tuple2<String, Iterable<String>> call(Tuple2<Tuple2<String, String>, Iterable<String>> t)
+					throws Exception {
+				String k = t._1._1;
+				Iterable<String> v = t._2;
+				return new Tuple2<String, Iterable<String>>(k, v);
 			}
 		});
 		/***JOIN BACK***/
-		JavaPairRDD<String, Tuple5<String, String, String, String, String>> back;
-		
+		//first join <String, Tuple4>
+		JavaPairRDD<String, Tuple4<String, String, String, Iterable<String>>> back1;
+		back1 = invarianti.join(SG).mapToPair(new PairFunction<Tuple2<String,Tuple2<Tuple3<String,String,String>,Iterable<String>>>, String, Tuple4<String, String, String, Iterable<String>>>() {
+			@Override
+			public Tuple2<String, Tuple4<String, String, String, Iterable<String>>> call(
+					Tuple2<String, Tuple2<Tuple3<String, String, String>, Iterable<String>>> t) throws Exception {
+				String k = t._1;
+				Tuple4<String, String, String, Iterable<String>> v = new Tuple4<String, String, String, Iterable<String>>(t._2._1._1(), t._2._1._2(), t._2._1._3(),t._2._2()); 
+				return new Tuple2<String, Tuple4<String,String,String,Iterable<String>>>(k,v);
+			}
+		});
 
-
+		//second join <String, Tuple5>
+		JavaPairRDD<String, Tuple5<String, String, String, Iterable<String>, Iterable<String>>> back2;
+		back2 = back1.join(G).mapToPair(new PairFunction<Tuple2<String,Tuple2<Tuple4<String,String,String,Iterable<String>>,Iterable<String>>>, String, Tuple5<String, String, String, Iterable<String>, Iterable<String>>>() {
+			@Override
+			public Tuple2<String, Tuple5<String, String, String, Iterable<String>, Iterable<String>>> call(
+					Tuple2<String, Tuple2<Tuple4<String, String, String, Iterable<String>>, Iterable<String>>> t)
+					throws Exception {
+				String k = t._1;
+				Tuple5<String, String, String, Iterable<String>, Iterable<String>> v = new Tuple5<String, String, String, Iterable<String>, Iterable<String>>(t._2._1._1(), t._2._1._2(), t._2._1._3(), t._2._1._4(), t._2._2());
+				return new Tuple2<String, Tuple5<String,String,String,Iterable<String>,Iterable<String>>>(k, v);
+			}
+		});
+		//third join <String, Tuple6>
+		JavaPairRDD<String, Tuple6<String, String, String, Iterable<String>, Iterable<String>, Iterable<String>>> back3;
+		back3 = back2.join(SubG).mapToPair(new PairFunction<Tuple2<String,Tuple2<Tuple5<String,String,String,Iterable<String>,Iterable<String>>,Iterable<String>>>, String, Tuple6<String, String, String, Iterable<String>, Iterable<String>, Iterable<String>>>() {
+			@Override
+			public Tuple2<String, Tuple6<String, String, String, Iterable<String>, Iterable<String>, Iterable<String>>> call(
+					Tuple2<String, Tuple2<Tuple5<String, String, String, Iterable<String>, Iterable<String>>, Iterable<String>>> t)
+					throws Exception {
+				String k = t._1;
+				Tuple6<String, String, String, Iterable<String>, Iterable<String>, Iterable<String>> v = new Tuple6<String, String, String, Iterable<String>, Iterable<String>, Iterable<String>>(t._2._1._1(), t._2._1._2(), t._2._1._3(), t._2._1._4(), t._2._1._5(), t._2._2());
+				return new Tuple2<String, Tuple6<String,String,String,Iterable<String>,Iterable<String>, Iterable<String>>>(k, v);
+			}
+		});
 		/**flat finale delle tuple**/
 		//		JavaRDD<String> flatted;
 		//		flatted = joined.flatMap(new FlatMapFunction<Tuple2<String,Tuple2<Tuple8<String, String, String, String, String, String, String, String>,Tuple2<String,String>>>, String>() {
@@ -230,53 +279,11 @@ public class OA_to_SOA {
 		OA_class_couples.saveAsTextFile(path_to_output_dir1);
 		//OUTPUT OA ed SOA
 		OA_to_SOA_couples.saveAsTextFile(path_to_output_dir2);
-		//OUTPUT join flatted, unique, LISTA
+		//OUTPUT join lista
+		back3.saveAsTextFile(path_to_output_dir3);
 		//		flatted.saveAsTextFile(path_to_output_dir3);
 
-		//		OA_to_SOA_couples.saveAsTextFile(path_to_output_dir);
-		//		OA_class_couples.saveAsTextFile(path_to_output_dir);
-
-		//		//reduce in <<DATA,ITEM>,COUNT_PER_ITEM>  
-		//		JavaPairRDD<Tuple2<String,String>, Integer> date_item_couples_reduced = 
-		//				date_item_couples.reduceByKey(new Function2<Integer, Integer, Integer>() {
-		//					public Integer call(Integer t1, Integer t2) {return t1+t2;}
-		//				});
-		//
-		//
-		//		//cambia formato da <<DATA,ITEM>,COUNT_PER_ITEM> a <DATA, <ITEM,COUNT_PER_ITEM>> 
-		//		JavaPairRDD<String,Tuple2<String,Integer>> date_as_key =
-		//				date_item_couples_reduced.mapToPair(new PairFunction< Tuple2< Tuple2<String,String>,Integer>, String, Tuple2<String,Integer>>() {
-		//					public Tuple2<String, Tuple2<String, Integer>> call(Tuple2<Tuple2<String, String>, Integer> arg0)	throws Exception {
-		//						return new Tuple2<String, Tuple2<String, Integer>>( arg0._1._1, new Tuple2<String,Integer>(arg0._1._2,arg0._2));
-		//					}
-		//				});
-		//
-		//		//raggruppa per chiave in <DATA, LIST[<ITEM,COUNT_PER_ITEM>]>
-		//		JavaPairRDD<String,Iterable<Tuple2<String,Integer>>> data_as_key_grouped = date_as_key.groupByKey();
-		//		data_as_key_grouped.cache();
-		//
-		//		//ordinamento item
-		//		JavaPairRDD<String,Iterable<Tuple2<String,Integer>>> ordered_items =
-		//				data_as_key_grouped.mapValues(
-		//						new Function<Iterable<Tuple2<String,Integer>>,Iterable<Tuple2<String,Integer>>>() {
-		//							public Iterable<Tuple2<String, Integer>> call(Iterable<Tuple2<String, Integer>> arg0)throws Exception {
-		//								List<Tuple2<String, Integer>> sortedList = new ArrayList<Tuple2<String, Integer>>();
-		//								int cont=0;
-		//								for (Tuple2<String, Integer> t : arg0) {
-		//									if(cont==5)
-		//										break;
-		//									sortedList.add(t);
-		//									cont=cont+1;
-		//								}
-		//								Collections.sort(sortedList,Utils.item_number_comparator);
-		//								return sortedList;
-		//							}
-		//						});
-		//
-		//		ordered_items.cache();
-		//		ordered_items.saveAsTextFile(path_to_output_dir);
-		//		List<Tuple2<String,Iterable<Tuple2<String, Integer>>>> result=ordered_items.collect();
-		//		//chiude il contesto
+		//chiude il contesto
 		sc.close();
 	}
 }//end App
