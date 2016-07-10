@@ -2,12 +2,12 @@
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 
-	<groupId>BD_hw1</groupId>
-	<artifactId>BD_hw1</artifactId>
+	<groupId>BD_hw2</groupId>
+	<artifactId>BD_hw2</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
 	<packaging>jar</packaging>
 
-	<name>BD_hw1</name>
+	<name>BD_hw2</name>
 	<url>http://maven.apache.org</url>
 
 	<properties>
