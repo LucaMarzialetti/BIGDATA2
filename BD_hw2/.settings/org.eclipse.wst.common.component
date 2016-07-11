@@ -6,6 +6,6 @@
         <wb-resource deploy-path="/WEB-INF/classes" source-path="/BD_hw2/documentation/documentation"/>
         <wb-resource deploy-path="/WEB-INF/classes" source-path="/documentation"/>
         <property name="context-root" value="BD_hw2"/>
-        <property name="java-output-path" value="/BD_hw2/build/classes"/>
+        <property name="java-output-path" value="/BD_hw2/target/classes"/>
     </wb-module>
 </project-modules>
