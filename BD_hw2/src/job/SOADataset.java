@@ -20,7 +20,7 @@ import scala.Tuple4;
 import scala.Tuple6;
 import scala.Tuple8;
 
-public class SOA_social_groups {
+public class SOADataset {
 
 	private static String path_to_dataset1;
 	private static String path_to_dataset2;
