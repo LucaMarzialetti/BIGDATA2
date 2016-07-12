@@ -1,6 +1,7 @@
-package job;
+package dataset;
 
 import java.util.Arrays;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -33,8 +34,8 @@ public class SOADataset {
 		//args[0]=input
 		//args[1]=input
 		//ags[2]=ouput
-		path_to_dataset1=args[0];
-		path_to_dataset2=args[1];
+		path_to_dataset1=args[0];//OA_class
+		path_to_dataset2=args[1];//OA_to_SOA
 		path_to_output_dir=args[2];
 		String appName = "SOA_social_groups";
 		conf = new SparkConf().setAppName(appName);
@@ -48,6 +49,22 @@ public class SOADataset {
 		//conf.setMaster("local[*]");
 		//sc.addJar("MBA.jar");
 		JavaRDD<String> rdd = sc.textFile(path);
+		rdd.mapPartitionsWithIndex(new Function2<Integer, Iterator<String>, Iterator<String>>() {
+			/**
+			 * 
+			 */
+			private static final long serialVersionUID = 1L;
+
+			@Override
+			public Iterator<String> call(Integer ind, Iterator<String> iterator) throws Exception {
+				if(ind==0 && iterator.hasNext()){
+					iterator.next();
+					return iterator;
+				}
+				else
+					return iterator;
+			}
+		},false);
 		return rdd;
 	}
 
@@ -66,7 +83,7 @@ public class SOADataset {
 					public Tuple2<String, Tuple8<String, String, String, String, String, String, String, String>> call(String line) {
 						Tuple2<String, Tuple8<String, String, String, String, String, String, String, String>> tupla = new Tuple2<String, Tuple8<String, String, String, String, String, String, String, String>>("", new Tuple8<String, String, String, String, String, String, String, String>("", "", "", "", "", "", "", ""));
 						if(!(line==null || line.isEmpty() || line.length()==0)){
-							String[] tokenizer = line.split(",");
+							String[] tokenizer = line.split(",",-1);
 							if(tokenizer.length>=10){
 								String oa = tokenizer[0];
 								String country_code = tokenizer[3];
@@ -220,24 +237,28 @@ public class SOADataset {
 				LinkedList<String> list = new LinkedList<String>();
 				LinkedList<String> ans = new LinkedList<String>();
 				String comp ="";
-				list.addAll(Arrays.asList(t.toString().replaceAll("[()]", "").split(",")));
+				list.addAll(Arrays.asList(t.toString().replaceAll("[()]", "").split(",",-1)));
 				int i;
+				//con virgolette
+//				for(i=0; i<list.size()-1; i++)
+//					comp+="\""+list.get(i)+"\", ";
+//				comp+="\""+list.get(i)+"\"";
 				for(i=0; i<list.size()-1; i++)
-					comp+="\""+list.get(i)+"\", ";
-				comp+="\""+list.get(i)+"\"";
+					comp+=list.get(i)+", ";
+				comp+=list.get(i);
 				ans.add(comp);
 				return ans;
 			}
 		});
-//		//OUTPUT oa_categorie
-//		OA_class_couples.saveAsTextFile(path_to_output_dir1);
-//		//OUTPUT OA ed SOA
-//		OA_to_SOA_couples.saveAsTextFile(path_to_output_dir2);
-//		//tutti i gruppi contati
-//		grouped.saveAsTextFile(path_to_output_dir3);
-//		//raggrupati dopo join
-//		top_groups.saveAsTextFile(path_to_output_dir4);
-//		//rappresentazione pulita
+		//		//OUTPUT oa_categorie
+		//		OA_class_couples.saveAsTextFile(path_to_output_dir1);
+		//		//OUTPUT OA ed SOA
+		//		OA_to_SOA_couples.saveAsTextFile(path_to_output_dir2);
+		//		//tutti i gruppi contati
+		//		grouped.saveAsTextFile(path_to_output_dir3);
+		//		//raggrupati dopo join
+		//		top_groups.saveAsTextFile(path_to_output_dir4);
+		//		//rappresentazione pulita
 		flatted.saveAsTextFile(path_to_output_dir);
 		//chiude il contesto
 		sc.close();

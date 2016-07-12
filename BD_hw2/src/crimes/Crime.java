@@ -6,6 +6,7 @@ import java.io.Serializable;
 public class Crime implements Serializable {
 	
 	String lsoa_code;
+	String lsoa_name;
 	String super_group;
 	String group;
 	String sub_group;
@@ -18,12 +19,15 @@ public class Crime implements Serializable {
 	
 	@Override
 	public String toString() {
-		return "Crime [lsoa_code=" + lsoa_code + ", super_group=" + super_group + ", group=" + group + ", sub_group="
+		return "Crime [lsoa_code=" + lsoa_code + ", lsoa_name=" + lsoa_name + ", super_group=" + super_group + ", group=" + group + ", sub_group="
 				+ sub_group + ", lat=" + lat + ", lon=" + lon + ", location=" + location + ", month=" + month
 				+ ", crime_type=" + crime_type + ", outcome=" + outcome + "]";
 	}
 	public String getLsoa_code() {
 		return lsoa_code;
+	}
+	public String getLsoa_name() {
+		return lsoa_name;
 	}
 	public String getSuper_group() {
 		return super_group;
@@ -54,6 +58,9 @@ public class Crime implements Serializable {
 	}
 	public void setLsoa_code(String lsoa_code) {
 		this.lsoa_code = lsoa_code;
+	}
+	public void setLsoa_name(String lsoa_name) {
+		this.lsoa_name = lsoa_name;
 	}
 	public void setSuper_group(String super_group) {
 		this.super_group = super_group;

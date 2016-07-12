@@ -11,7 +11,6 @@ import org.apache.spark.api.java.JavaRDD;
 import org.apache.spark.api.java.JavaSparkContext;
 import org.apache.spark.api.java.function.Function;
 import org.apache.spark.api.java.function.PairFunction;
-import org.apache.spark.rdd.RDD;
 
 import scala.Tuple2;
 
@@ -56,129 +55,147 @@ public class MachineLearning {
 
 		//carica il file csv
 		JavaRDD<String> input_csv = loadData();
-		
+
 		//crea un RDD di oggetti di tipo Flight
 		JavaRDD<Crime> crimes = input_csv.map(
 				new Function<String, Crime>() {
 					public Crime call(String line) throws Exception {
-						StringTokenizer st=new StringTokenizer(line,",");
 						Crime c = new Crime();
-						c.setCrime_type(st.nextToken());
-						c.setGroup(st.nextToken());
-						c.setLat(st.nextToken());
-						c.setLocation(st.nextToken());
-						c.setLon(st.nextToken());
-						c.setLsoa_code(st.nextToken());
-						c.setMonth(st.nextToken());
-						c.setOutcome(st.nextToken());
-						c.setSub_group(st.nextToken());
-						c.setSuper_group(st.nextToken());
+						if(!(line==null || line.isEmpty() || line.length()==0)){
+							String[] tokenizer = line.split(",");
+							if(tokenizer.length>=10){
+								//extract
+								String soa_code = tokenizer[0];
+								String soa_name = tokenizer[1];
+								String supergroup = tokenizer[2];
+								String group = tokenizer[3];
+								String subgroup = tokenizer[4];
+								String crimeType = tokenizer[5];
+								String outcome = tokenizer[6];
+								String month = tokenizer[7];
+								String lon = tokenizer[8];
+								String lat = tokenizer[9];
+								String location = tokenizer[10];
+								//set
+								c.setLsoa_code(soa_code);
+								c.setLsoa_name(soa_name);
+								c.setSuper_group(supergroup);
+								c.setGroup(group);
+								c.setSub_group(subgroup);
+								c.setCrime_type(crimeType);
+								c.setOutcome(outcome);
+								c.setMonth(month);
+								c.setLon(lon);
+								c.setLat(lat);
+								c.setLocation(location);
+							}
+						}
 						return c;
 					}
 				});
-		
+
 		//conversione della feature non numerica "carrier" in numerica
 		Map<String,Integer> crime_type_to_int_map= new HashMap<String, Integer>();
 		crimes.map(crime -> crime.crime_type)
 		.collect()
 		.forEach( 
 				crime_type -> { 	Integer int_code=0; 
-									if(!crime_type_to_int_map.containsKey(crime_type)){
-										crime_type_to_int_map.put(crime_type, int_code); int_code=int_code+1;} });
-		
+				if(!crime_type_to_int_map.containsKey(crime_type)){
+					crime_type_to_int_map.put(crime_type, int_code); int_code=int_code+1;} });
+
 		Map<String,Integer> group_to_int_map= new HashMap<String, Integer>();
 		crimes.map(crime -> crime.group)
 		.collect()
 		.forEach( 
 				group -> { 	Integer int_code=0; 
-									if(!group_to_int_map.containsKey(group)){
-										group_to_int_map.put(group, int_code); int_code=int_code+1;} });
-		
+				if(!group_to_int_map.containsKey(group)){
+					group_to_int_map.put(group, int_code); int_code=int_code+1;} });
+
 		Map<String,Integer> lat_to_int_map= new HashMap<String, Integer>();
 		crimes.map(crime -> crime.lat)
 		.collect()
 		.forEach( 
 				lat -> { 	Integer int_code=0; 
-									if(!lat_to_int_map.containsKey(lat)){
-										lat_to_int_map.put(lat, int_code); int_code=int_code+1;} });
-		
+				if(!lat_to_int_map.containsKey(lat)){
+					lat_to_int_map.put(lat, int_code); int_code=int_code+1;} });
+
 		Map<String,Integer> loc_to_int_map= new HashMap<String, Integer>();
 		crimes.map(crime -> crime.location)
 		.collect()
 		.forEach( 
 				loc -> { 	Integer int_code=0; 
-									if(!loc_to_int_map.containsKey(loc)){
-										loc_to_int_map.put(loc, int_code); int_code=int_code+1;} });
+				if(!loc_to_int_map.containsKey(loc)){
+					loc_to_int_map.put(loc, int_code); int_code=int_code+1;} });
 
 		Map<String,Integer> lon_to_int_map= new HashMap<String, Integer>();
 		crimes.map(crime -> crime.lon)
 		.collect()
 		.forEach( 
 				lon -> { 	Integer int_code=0; 
-									if(!lon_to_int_map.containsKey(lon)){
-										lon_to_int_map.put(lon, int_code); int_code=int_code+1;} });
+				if(!lon_to_int_map.containsKey(lon)){
+					lon_to_int_map.put(lon, int_code); int_code=int_code+1;} });
 
 		Map<String,Integer> lsoa_to_int_map= new HashMap<String, Integer>();
 		crimes.map(crime -> crime.lsoa_code)
 		.collect()
 		.forEach( 
 				lsoa -> { 	Integer int_code=0; 
-									if(!lsoa_to_int_map.containsKey(lsoa)){
-										lsoa_to_int_map.put(lsoa, int_code); int_code=int_code+1;} });
+				if(!lsoa_to_int_map.containsKey(lsoa)){
+					lsoa_to_int_map.put(lsoa, int_code); int_code=int_code+1;} });
 
 		Map<String,Integer> month_to_int_map= new HashMap<String, Integer>();
 		crimes.map(crime -> crime.month)
 		.collect()
 		.forEach( 
 				month -> { 	Integer int_code=0; 
-									if(!month_to_int_map.containsKey(month)){
-										month_to_int_map.put(month, int_code); int_code=int_code+1;} });
+				if(!month_to_int_map.containsKey(month)){
+					month_to_int_map.put(month, int_code); int_code=int_code+1;} });
 
 		Map<String,Integer> outcome_to_int_map= new HashMap<String, Integer>();
 		crimes.map(crime -> crime.outcome)
 		.collect()
 		.forEach( 
 				outcome -> { 	Integer int_code=0; 
-									if(!outcome_to_int_map.containsKey(outcome)){
-										outcome_to_int_map.put(outcome, int_code); int_code=int_code+1;} });
+				if(!outcome_to_int_map.containsKey(outcome)){
+					outcome_to_int_map.put(outcome, int_code); int_code=int_code+1;} });
 
 		Map<String,Integer> subgroup_to_int_map= new HashMap<String, Integer>();
 		crimes.map(crime -> crime.sub_group)
 		.collect()
 		.forEach( 
 				sgroup -> { 	Integer int_code=0; 
-									if(!subgroup_to_int_map.containsKey(sgroup)){
-										subgroup_to_int_map.put(sgroup, int_code); int_code=int_code+1;} });
+				if(!subgroup_to_int_map.containsKey(sgroup)){
+					subgroup_to_int_map.put(sgroup, int_code); int_code=int_code+1;} });
 
 		Map<String,Integer> supgroup_to_int_map= new HashMap<String, Integer>();
 		crimes.map(crime -> crime.super_group)
 		.collect()
 		.forEach( 
 				supgroup -> { 	Integer int_code=0; 
-									if(!supgroup_to_int_map.containsKey(supgroup)){
-										supgroup_to_int_map.put(supgroup, int_code); int_code=int_code+1;} });
+				if(!supgroup_to_int_map.containsKey(supgroup)){
+					supgroup_to_int_map.put(supgroup, int_code); int_code=int_code+1;} });
 
 		//creazione RDD di LabeledPoint = etichetta + feature vector
 		JavaRDD<LabeledPoint> labeled_points = crimes.map(
 				new Function<Crime, LabeledPoint>() {
 					public LabeledPoint call(Crime crime) throws Exception {
-								double outcome_label;
-								if(crime.getOutcome().equals("Investigation complete; no suspect identified")) {outcome_label=0.0;} 
-								else {outcome_label=1.0;}
-								return new LabeledPoint(outcome_label,
-												Vectors.dense(	(double)crime_type_to_int_map.get(crime.crime_type),
-																(double)group_to_int_map.get(crime.group),
-																(double)lat_to_int_map.get(crime.lat),
-																(double)loc_to_int_map.get(crime.location),
-																(double)lon_to_int_map.get(crime.lon),
-																(double)lsoa_to_int_map.get(crime.lsoa_code),
-																(double)month_to_int_map.get(crime.month),
-																(double)subgroup_to_int_map.get(crime.sub_group),
-																(double)supgroup_to_int_map.get(crime.super_group))
+						double outcome_label;
+						if(crime.getOutcome().equals("Investigation complete; no suspect identified")) {outcome_label=0.0;} 
+						else {outcome_label=1.0;}
+						return new LabeledPoint(outcome_label,
+								Vectors.dense(	(double)crime_type_to_int_map.get(crime.crime_type),
+										(double)group_to_int_map.get(crime.group),
+										(double)lat_to_int_map.get(crime.lat),
+										(double)loc_to_int_map.get(crime.location),
+										(double)lon_to_int_map.get(crime.lon),
+										(double)lsoa_to_int_map.get(crime.lsoa_code),
+										(double)month_to_int_map.get(crime.month),
+										(double)subgroup_to_int_map.get(crime.sub_group),
+										(double)supgroup_to_int_map.get(crime.super_group))
 								);}//end call
 				});//end map
-		
-		
+
+
 		/*
 		 * a cosa serve questo passaggio?
 		 */
@@ -187,7 +204,7 @@ public class MachineLearning {
 		JavaRDD<LabeledPoint> not_solved=labeled_points.filter(labeled_point -> labeled_point.label () == 0.0).randomSplit(weights)[0];
 		JavaRDD<LabeledPoint> solved=labeled_points.filter(labeled_point -> labeled_point.label () != 0.0);
 		JavaRDD<LabeledPoint> full_set=not_solved.union(solved);
-		
+
 		/*
 		 * Nota: usare un anno per fare training e un anno successivo per fare testing
 		 */
@@ -200,7 +217,7 @@ public class MachineLearning {
 		//setta parametri dell'albero di decisione
 		//classi possibili per l'etichetta_ solved o not_solved
 		Integer num_classes = 2;
-		
+
 		//range dei valori della feature alla posizione indicata dalla chiave
 		Map<Integer, Integer> categorical_features_info = new HashMap<Integer, Integer>();
 		//categorical_features_info.put(0, 31);								//feature in posizione 0=dayofmonth, valori da 0 a 30 
@@ -220,27 +237,27 @@ public class MachineLearning {
 		Integer max_depth = 9;
 		//numero massimo di intervalli in cui dividere (discretizzare) i dati continui
 		Integer max_discretization_bins = 7000;
-		
+
 		//costruisce l'albero di decisione con i parametri settati
 		DecisionTreeModel decision_tree_model = DecisionTree.trainClassifier(training_set, num_classes, categorical_features_info, impurity_metric, max_depth, max_discretization_bins);
-		
+
 		//applica l'albero costruito al test set, per assegnare un valore alla label
 		JavaPairRDD<Double, Double> predictions_on_test_set =
-				  test_set.mapToPair(p -> new Tuple2<Double, Double> (decision_tree_model.predict(p.features()), p.label()));
+				test_set.mapToPair(p -> new Tuple2<Double, Double> (decision_tree_model.predict(p.features()), p.label()));
 
 		//calcola l'errore di predizione, come numero di predizioni corrette sul totale (percentuale)
 		Double prediction_error_value =
-				  1.0 * predictions_on_test_set.filter(
-						  new Function<Tuple2<Double, Double>, Boolean>() {
-							  @Override
-							  public Boolean call(Tuple2<Double, Double> t) {
-								  return !t._1().equals(t._2());
-							  }
-				  }).count() / test_set.count();
+				1.0 * predictions_on_test_set.filter(
+						new Function<Tuple2<Double, Double>, Boolean>() {
+							@Override
+							public Boolean call(Tuple2<Double, Double> t) {
+								return !t._1().equals(t._2());
+							}
+						}).count() / test_set.count();
 
 		// Save model
 		decision_tree_model.save(sc.sc(), path_to_output_dir);
-				
-	
+
+
 	}//end decision_tree
 }
