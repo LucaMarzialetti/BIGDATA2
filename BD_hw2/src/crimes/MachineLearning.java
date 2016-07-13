@@ -4,6 +4,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.StringTokenizer;
@@ -13,6 +14,7 @@ import org.apache.spark.api.java.JavaPairRDD;
 import org.apache.spark.api.java.JavaRDD;
 import org.apache.spark.api.java.JavaSparkContext;
 import org.apache.spark.api.java.function.Function;
+import org.apache.spark.api.java.function.Function2;
 import org.apache.spark.api.java.function.PairFunction;
 
 import scala.Tuple2;
@@ -39,25 +41,47 @@ public class MachineLearning {
 		}
 
 		path_to_dataset=args[0];		//ml_dataset
-		path_to_output_dir=args[1];		
+		path_to_output_dir=args[1];	
+		String appName = "MLearning";
+		conf = new SparkConf().setAppName(appName);
+		sc = new JavaSparkContext(conf);
 		decision_tree();
+		sc.close();
 	}//end main
 
-	// Load the data from the csv file and return an RDD 
-	public static JavaRDD<String> loadData() { 
+	// Load the data from CSVs
+	public static JavaRDD<String> loadData(String path, boolean header) { 
 		// create spark configuration and spark context
-		conf = new SparkConf().setAppName("MLearning");//.setMaster("local[*]");
-		sc = new JavaSparkContext(conf);
+		//conf.setMaster("local[*]");
 		//sc.addJar("MBA.jar");
-		JavaRDD<String>  one_year_input_csv = sc.textFile(path_to_dataset);
-		return  one_year_input_csv;
+		JavaRDD<String> rdd = sc.textFile(path);
+		if(header){
+			rdd = rdd.mapPartitionsWithIndex(new Function2<Integer, Iterator<String>, Iterator<String>>() {
+				/**
+				 * 
+				 */
+				private static final long serialVersionUID = 1L;
+
+				@Override
+				public Iterator<String> call(Integer ind, Iterator<String> iterator) throws Exception {
+					if(ind==0 && iterator.hasNext()){
+						iterator.next();
+						return iterator;
+					}
+					else
+						return iterator;
+				}
+			},false);
+		}
+		return rdd;
 	}
+
 
 	@SuppressWarnings("serial")
 	public static void decision_tree() {
 
 		//carica il file csv
-		JavaRDD<String> input_csv = loadData();
+		JavaRDD<String> input_csv = loadData(path_to_dataset,false);
 
 		//crea un RDD di oggetti di tipo Flight
 		JavaRDD<Crime> crimes = input_csv.map(
@@ -267,7 +291,5 @@ public class MachineLearning {
 		list.add("zio porcone");
 		JavaRDD<String> model=sc.parallelize(list);
 		model.saveAsTextFile(path_to_output_dir);
-
-
 	}//end decision_tree
 }

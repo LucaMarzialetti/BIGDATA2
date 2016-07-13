@@ -37,6 +37,7 @@ public class MachineLearningDataset {
 		conf = new SparkConf().setAppName(appName);
 		sc = new JavaSparkContext(conf);
 		OA_to_SOA_job();
+		sc.close();
 	}
 
 	// Load the data from CSVs
@@ -46,7 +47,7 @@ public class MachineLearningDataset {
 		//sc.addJar("MBA.jar");
 		JavaRDD<String> rdd = sc.textFile(path);
 		if(header){
-			rdd.mapPartitionsWithIndex(new Function2<Integer, Iterator<String>, Iterator<String>>() {
+			rdd = rdd.mapPartitionsWithIndex(new Function2<Integer, Iterator<String>, Iterator<String>>() {
 				/**
 				 * 
 				 */
@@ -168,8 +169,5 @@ public class MachineLearningDataset {
 		});	
 		flatted = flatted.coalesce(1,true);
 		flatted.saveAsTextFile(path_to_output_dir);
-		//chiude il contesto
-		sc.close();
-
 	}
 }

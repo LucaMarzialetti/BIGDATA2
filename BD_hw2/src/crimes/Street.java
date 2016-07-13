@@ -36,6 +36,7 @@ public class Street {
 		conf = new SparkConf().setAppName(appName);
 		sc = new JavaSparkContext(conf);
 		crime_frequency_by_lsoa();
+		sc.close();
 	}//end main
 
 	// Load the data from CSVs
@@ -45,7 +46,7 @@ public class Street {
 		//sc.addJar("MBA.jar");
 		JavaRDD<String> rdd = sc.textFile(path);
 		if(header){
-			rdd.mapPartitionsWithIndex(new Function2<Integer, Iterator<String>, Iterator<String>>() {
+			rdd = rdd.mapPartitionsWithIndex(new Function2<Integer, Iterator<String>, Iterator<String>>() {
 				/**
 				 * 
 				 */
@@ -67,7 +68,7 @@ public class Street {
 
 	//Street reports analysis : social groups-crime types relationships
 	@SuppressWarnings("serial")
-	public static List<Tuple2<Tuple5<String,String,String,String,String>,Iterable<Tuple3<String,String,Integer>>>> crime_frequency_by_lsoa() {
+	public static void crime_frequency_by_lsoa() {
 
 		//formato originale  
 		JavaRDD<String> crime_reports_joined_fields = loadData(path_to_dataset,true);
@@ -156,9 +157,6 @@ public class Street {
 //		flatted.saveAsTextFile(path_to_output_dir);	
 		lsoa_and_group_as_key_grouped_ordered = lsoa_and_group_as_key_grouped_ordered.coalesce(1);
 		lsoa_and_group_as_key_grouped_ordered.saveAsTextFile(path_to_output_dir);
-		List<Tuple2<Tuple5<String, String, String, String, String>, Iterable<Tuple3<String, String, Integer>>>> result= lsoa_and_group_as_key_grouped_ordered.collect();
-		sc.close();
-		return result;
 	}//end class
 
 }//end App

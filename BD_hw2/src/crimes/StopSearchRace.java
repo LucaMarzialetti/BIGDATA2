@@ -48,7 +48,7 @@ public class StopSearchRace {
 		//sc.addJar("MBA.jar");
 		JavaRDD<String> rdd = sc.textFile(path);
 		if(header){
-			rdd.mapPartitionsWithIndex(new Function2<Integer, Iterator<String>, Iterator<String>>() {
+			rdd = rdd.mapPartitionsWithIndex(new Function2<Integer, Iterator<String>, Iterator<String>>() {
 				/**
 				 * 
 				 */
