@@ -161,7 +161,7 @@ public class StreetDataset {
 				return ans;
 			}
 		});	
-		flatted.coalesce(1);
+		flatted = flatted.coalesce(1);
 		flatted.saveAsTextFile(path_to_output_dir);
 	}
 }

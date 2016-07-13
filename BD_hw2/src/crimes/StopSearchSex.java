@@ -1,5 +1,6 @@
 package crimes;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -42,12 +43,28 @@ public class StopSearchSex {
 		sc.close();
 	}//end main
 
+	public static JavaRDD<String> loadNestedData(String path, boolean header) {
+		File file = new File(path);
+		JavaRDD<String> merged = sc.emptyRDD();
+		String[] names = file.list();
+		for(String name : names){
+			JavaRDD<String> tmp = loadData(path+"/"+name, header);
+			merged = merged.union(tmp);
+		}
+		return merged;
+	}
+
+
 	// Load the data from CSVs
 	public static JavaRDD<String> loadData(String path, boolean header) { 
 		// create spark configuration and spark context
 		//conf.setMaster("local[*]");
 		//sc.addJar("MBA.jar");
-		JavaRDD<String> rdd = sc.textFile(path);
+		JavaRDD<String> rdd = sc.emptyRDD();
+		if(new File(path).isDirectory())
+			rdd = loadNestedData(path, header);
+		else
+			rdd = sc.textFile(path);
 		if(header){
 			rdd = rdd.mapPartitionsWithIndex(new Function2<Integer, Iterator<String>, Iterator<String>>() {
 				/**
