@@ -61,10 +61,14 @@ public class StopSearchSex {
 		//conf.setMaster("local[*]");
 		//sc.addJar("MBA.jar");
 		JavaRDD<String> rdd = sc.emptyRDD();
-		if(new File(path).isDirectory())
+		File f = new File(path);
+		if(f.isDirectory())
 			rdd = loadNestedData(path, header);
 		else
-			rdd = sc.textFile(path);
+			if(f.isFile())
+				rdd = sc.textFile(path);
+			else 
+				rdd = sc.emptyRDD();
 		if(header){
 			rdd = rdd.mapPartitionsWithIndex(new Function2<Integer, Iterator<String>, Iterator<String>>() {
 				/**
