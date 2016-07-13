@@ -1,10 +1,9 @@
 package dataset;
 
+import java.io.File;
 import java.util.Arrays;
 import java.util.Iterator;
 import java.util.LinkedList;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import org.apache.spark.SparkConf;
 import org.apache.spark.api.java.JavaPairRDD;
@@ -66,13 +65,24 @@ public class StreetDataset {
 		return rdd;
 	}
 
+	public static JavaRDD<String> loadNestedData(String path, boolean header) {
+		File file = new File(path);
+		JavaRDD<String> merged = sc.emptyRDD();
+		String[] names = file.list();
+		for(String name : names){
+			JavaRDD<String> tmp = loadData(path+"/"+name, header);
+			merged = merged.union(tmp);
+		}
+		return merged;
+	}
+
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	/**map oa and social groups to soa**/
 	@SuppressWarnings("serial")
 	public static void OA_to_SOA_job() {
 		//load data
 		JavaRDD<String> SOA_sg = loadData(path_to_dataset1, false);
-		JavaRDD<String> street = loadData(path_to_dataset2, true);
+		JavaRDD<String> street = loadNestedData(path_to_dataset2, true);
 		/**MAPPING**/
 		//mapping di soa_sg
 		JavaPairRDD<Tuple2<String, String>, Tuple3<String, String, String>> SOA_sg_couples;
@@ -83,22 +93,13 @@ public class StreetDataset {
 				if(!(line==null || line.isEmpty() || line.length()==0)) {
 					//separatore tra double quotes
 					//tutto quello che c'è tra due double quotes consecutive
-					Pattern p = Pattern.compile("\"([^\"]*)\"");
-					Matcher m = p.matcher(line);
-					int i = 1;
-					String soa_code=null,soa_name=null, supg=null, g=null, subg=null;
-					while(m.find()) {
-						switch (i) {
-						case 1 : {soa_code = m.group(1);break;}
-						case 2 : {soa_name = m.group(1);break;}
-						case 5 : {supg = m.group(1);break;}
-						case 6 : {g = m.group(1);break;}
-						case 7 : {subg = m.group(1);break;}
-						default :break;
-						}
-						i++;
-					}
-					if(i>=7) {
+					String[] tokens = line.split(",",-1);
+					if(tokens.length>=6){
+						String soa_code = tokens[0];
+						String soa_name = tokens[1];
+						String supg = tokens[4];
+						String g = tokens[5];
+						String subg = tokens[6];
 						Tuple2<String,String> k = new Tuple2<String, String>(soa_code,soa_name);
 						Tuple3<String, String, String> v = new Tuple3<String, String, String>(supg, g, subg);
 						tupla = new Tuple2<Tuple2<String,String>, Tuple3<String,String,String>>(k, v);
@@ -114,7 +115,7 @@ public class StreetDataset {
 			public Tuple2<Tuple2<String, String>, Tuple2<String, String>> call(String line) throws Exception {
 				Tuple2<Tuple2<String,String>, Tuple2<String,String>> tupla = new Tuple2<Tuple2<String,String>, Tuple2<String,String>>(new Tuple2<String, String>("", ""), new Tuple2<String, String>("", ""));
 				if(!(line==null || line.isEmpty() || line.length()==0)){
-					String[] tokenizer = line.split(",");
+					String[] tokenizer = line.split(",",-1);
 					if(tokenizer.length>=10){
 						String soa_code = tokenizer[7];
 						String soa_name = tokenizer[8];
@@ -140,7 +141,8 @@ public class StreetDataset {
 				return new Tuple2<Tuple2<String,String>, Tuple5<String,String,String,String,String>>(k, v);
 			}
 		});
-		//flatted lsoa,
+		//flatted 	1			2			3				4			5			6		7
+		//			lsoa_code 	lsoa_name 	supergroups		groups		subgroups	crime	outcome
 		JavaRDD<String> flatted;
 		flatted = joined.flatMap(new FlatMapFunction<Tuple2<Tuple2<String,String>,Tuple5<String,String,String,String,String>>, String>() {
 			@Override
@@ -149,10 +151,10 @@ public class StreetDataset {
 				LinkedList<String> list = new LinkedList<String>();
 				LinkedList<String> ans = new LinkedList<String>();
 				String comp ="";
-				list.addAll(Arrays.asList(t.toString().replaceAll("[()]", "").split(",")));
+				list.addAll(Arrays.asList(t.toString().replaceAll("[()]", "").split(",",-1)));
 				int i;
 				for(i=0; i<list.size()-1; i++)
-					comp+=list.get(i)+", ";
+					comp+=list.get(i)+",";
 				comp+=list.get(i);
 				ans.add(comp);
 				return ans;

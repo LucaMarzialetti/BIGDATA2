@@ -5,17 +5,17 @@ import java.io.Serializable;
 @SuppressWarnings("serial")
 public class Crime implements Serializable {
 	
-	String lsoa_code;
-	String lsoa_name;
-	String super_group;
-	String group;
-	String sub_group;
-	String lat;
-	String lon;
-	String location;
-	String month;
-	String crime_type;
-	String outcome;
+	private String lsoa_code;
+	private String lsoa_name;
+	private String super_group;
+	private String group;
+	private String sub_group;
+	private String lat;
+	private String lon;
+	private String location;
+	private String month;
+	private String crime_type;
+	private String outcome;
 	
 	@Override
 	public String toString() {

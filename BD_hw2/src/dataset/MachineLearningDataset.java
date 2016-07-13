@@ -4,8 +4,6 @@ import java.io.File;
 import java.util.Arrays;
 import java.util.Iterator;
 import java.util.LinkedList;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import org.apache.spark.SparkConf;
 import org.apache.spark.api.java.JavaPairRDD;
@@ -96,22 +94,13 @@ public class MachineLearningDataset {
 				if(!(line==null || line.isEmpty() || line.length()==0)) {
 					//separatore tra double quotes
 					//tutto quello che c'è tra due double quotes consecutive
-					Pattern p = Pattern.compile("\"([^\"]*)\"");
-					Matcher m = p.matcher(line);
-					int i = 1;
-					String soa_code=null,soa_name=null, supg=null, g=null, subg=null;
-					while(m.find()) {
-						switch (i) {
-						case 1 : {soa_code = m.group(1);break;}
-						case 2 : {soa_name = m.group(1);break;}
-						case 5 : {supg = m.group(1);break;}
-						case 6 : {g = m.group(1);break;}
-						case 7 : {subg = m.group(1);break;}
-						default :break;
-						}
-						i++;
-					}
-					if(i>=7) {
+					String[] tokens = line.split(",",-1);
+					if(tokens.length>=6){
+						String soa_code = tokens[0];
+						String soa_name = tokens[1];
+						String supg = tokens[4];
+						String g = tokens[5];
+						String subg = tokens[6];
 						Tuple2<String,String> k = new Tuple2<String, String>(soa_code,soa_name);
 						Tuple3<String, String, String> v = new Tuple3<String, String, String>(supg, g, subg);
 						tupla = new Tuple2<Tuple2<String,String>, Tuple3<String,String,String>>(k, v);
@@ -119,7 +108,7 @@ public class MachineLearningDataset {
 				}
 				return tupla;
 			}
-		});
+		});	
 		//mapping di street
 		JavaPairRDD<Tuple2<String, String>, Tuple6<String, String, String, String, String, String>> street_couples;
 		street_couples = street.mapToPair(new PairFunction<String, Tuple2<String, String>, Tuple6<String, String, String, String, String, String>>(){
@@ -171,13 +160,13 @@ public class MachineLearningDataset {
 				list.addAll(Arrays.asList(t.toString().replaceAll("[()]", "").split(",",-1)));
 				int i;
 				for(i=0; i<list.size()-1; i++)
-					comp+=list.get(i)+", ";
+					comp+=list.get(i)+",";
 				comp+=list.get(i);
 				ans.add(comp);
 				return ans;
 			}
 		});	
-		flatted.coalesce(1);
+		flatted = flatted.coalesce(1,true);
 		flatted.saveAsTextFile(path_to_output_dir);
 		//chiude il contesto
 		sc.close();

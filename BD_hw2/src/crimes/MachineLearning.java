@@ -1,5 +1,8 @@
 package crimes;
 
+import java.io.FileWriter;
+import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -35,8 +38,8 @@ public class MachineLearning {
 			System.exit(1);
 		}
 
-		path_to_dataset=args[0];
-		path_to_output_dir=args[1];
+		path_to_dataset=args[0];		//ml_dataset
+		path_to_output_dir=args[1];		
 		decision_tree();
 	}//end main
 
@@ -62,7 +65,7 @@ public class MachineLearning {
 					public Crime call(String line) throws Exception {
 						Crime c = new Crime();
 						if(!(line==null || line.isEmpty() || line.length()==0)){
-							String[] tokenizer = line.split(",");
+							String[] tokenizer = line.split(",", -1);
 							if(tokenizer.length>=10){
 								//extract
 								String soa_code = tokenizer[0];
@@ -96,7 +99,7 @@ public class MachineLearning {
 
 		//conversione della feature non numerica "carrier" in numerica
 		Map<String,Integer> crime_type_to_int_map= new HashMap<String, Integer>();
-		crimes.map(crime -> crime.crime_type)
+		crimes.map(crime -> crime.getCrime_type())
 		.collect()
 		.forEach( 
 				crime_type -> { 	Integer int_code=0; 
@@ -104,7 +107,7 @@ public class MachineLearning {
 					crime_type_to_int_map.put(crime_type, int_code); int_code=int_code+1;} });
 
 		Map<String,Integer> group_to_int_map= new HashMap<String, Integer>();
-		crimes.map(crime -> crime.group)
+		crimes.map(crime -> crime.getGroup())
 		.collect()
 		.forEach( 
 				group -> { 	Integer int_code=0; 
@@ -112,7 +115,7 @@ public class MachineLearning {
 					group_to_int_map.put(group, int_code); int_code=int_code+1;} });
 
 		Map<String,Integer> lat_to_int_map= new HashMap<String, Integer>();
-		crimes.map(crime -> crime.lat)
+		crimes.map(crime -> crime.getLat())
 		.collect()
 		.forEach( 
 				lat -> { 	Integer int_code=0; 
@@ -120,7 +123,7 @@ public class MachineLearning {
 					lat_to_int_map.put(lat, int_code); int_code=int_code+1;} });
 
 		Map<String,Integer> loc_to_int_map= new HashMap<String, Integer>();
-		crimes.map(crime -> crime.location)
+		crimes.map(crime -> crime.getLocation())
 		.collect()
 		.forEach( 
 				loc -> { 	Integer int_code=0; 
@@ -128,7 +131,7 @@ public class MachineLearning {
 					loc_to_int_map.put(loc, int_code); int_code=int_code+1;} });
 
 		Map<String,Integer> lon_to_int_map= new HashMap<String, Integer>();
-		crimes.map(crime -> crime.lon)
+		crimes.map(crime -> crime.getLon())
 		.collect()
 		.forEach( 
 				lon -> { 	Integer int_code=0; 
@@ -136,7 +139,7 @@ public class MachineLearning {
 					lon_to_int_map.put(lon, int_code); int_code=int_code+1;} });
 
 		Map<String,Integer> lsoa_to_int_map= new HashMap<String, Integer>();
-		crimes.map(crime -> crime.lsoa_code)
+		crimes.map(crime -> crime.getLsoa_code())
 		.collect()
 		.forEach( 
 				lsoa -> { 	Integer int_code=0; 
@@ -144,7 +147,7 @@ public class MachineLearning {
 					lsoa_to_int_map.put(lsoa, int_code); int_code=int_code+1;} });
 
 		Map<String,Integer> month_to_int_map= new HashMap<String, Integer>();
-		crimes.map(crime -> crime.month)
+		crimes.map(crime -> crime.getMonth())
 		.collect()
 		.forEach( 
 				month -> { 	Integer int_code=0; 
@@ -152,7 +155,7 @@ public class MachineLearning {
 					month_to_int_map.put(month, int_code); int_code=int_code+1;} });
 
 		Map<String,Integer> outcome_to_int_map= new HashMap<String, Integer>();
-		crimes.map(crime -> crime.outcome)
+		crimes.map(crime -> crime.getOutcome())
 		.collect()
 		.forEach( 
 				outcome -> { 	Integer int_code=0; 
@@ -160,7 +163,7 @@ public class MachineLearning {
 					outcome_to_int_map.put(outcome, int_code); int_code=int_code+1;} });
 
 		Map<String,Integer> subgroup_to_int_map= new HashMap<String, Integer>();
-		crimes.map(crime -> crime.sub_group)
+		crimes.map(crime -> crime.getSub_group())
 		.collect()
 		.forEach( 
 				sgroup -> { 	Integer int_code=0; 
@@ -168,7 +171,7 @@ public class MachineLearning {
 					subgroup_to_int_map.put(sgroup, int_code); int_code=int_code+1;} });
 
 		Map<String,Integer> supgroup_to_int_map= new HashMap<String, Integer>();
-		crimes.map(crime -> crime.super_group)
+		crimes.map(crime -> crime.getSuper_group())
 		.collect()
 		.forEach( 
 				supgroup -> { 	Integer int_code=0; 
@@ -180,18 +183,19 @@ public class MachineLearning {
 				new Function<Crime, LabeledPoint>() {
 					public LabeledPoint call(Crime crime) throws Exception {
 						double outcome_label;
-						if(crime.getOutcome().equals("Investigation complete; no suspect identified")) {outcome_label=0.0;} 
-						else {outcome_label=1.0;}
+						if(crime.getOutcome().equals("Investigation complete; no suspect identified")) {outcome_label=1.0;} 
+						else {outcome_label=0.0;}
 						return new LabeledPoint(outcome_label,
-								Vectors.dense(	(double)crime_type_to_int_map.get(crime.crime_type),
-										(double)group_to_int_map.get(crime.group),
-										(double)lat_to_int_map.get(crime.lat),
-										(double)loc_to_int_map.get(crime.location),
-										(double)lon_to_int_map.get(crime.lon),
-										(double)lsoa_to_int_map.get(crime.lsoa_code),
-										(double)month_to_int_map.get(crime.month),
-										(double)subgroup_to_int_map.get(crime.sub_group),
-										(double)supgroup_to_int_map.get(crime.super_group))
+								Vectors.dense(	
+										(double)crime_type_to_int_map.get(crime.getCrime_type()),
+										(double)group_to_int_map.get(crime.getGroup()),
+//										(double)lat_to_int_map.get(crime.getLat()),
+//										(double)loc_to_int_map.get(crime.getLocation()),
+//										(double)lon_to_int_map.get(crime.getLon()),
+//										(double)lsoa_to_int_map.get(crime.getLsoa_code()),
+										(double)month_to_int_map.get(crime.getMonth()),
+										(double)subgroup_to_int_map.get(crime.getSub_group()),
+										(double)supgroup_to_int_map.get(crime.getSuper_group()))
 								);}//end call
 				});//end map
 
@@ -222,21 +226,22 @@ public class MachineLearning {
 		Map<Integer, Integer> categorical_features_info = new HashMap<Integer, Integer>();
 		//categorical_features_info.put(0, 31);								//feature in posizione 0=dayofmonth, valori da 0 a 30 
 		//categorical_features_info.put(1, 7);								//feature in posizione 1=dayofweek, valori da 0 a 30
-		categorical_features_info.put(0, group_to_int_map.size());
-		categorical_features_info.put(1, lat_to_int_map.size());
-		categorical_features_info.put(2, loc_to_int_map.size());
-		categorical_features_info.put(3, lon_to_int_map.size());
-		categorical_features_info.put(4, lsoa_to_int_map.size());
-		categorical_features_info.put(5, month_to_int_map.size());
-		categorical_features_info.put(6, subgroup_to_int_map.size());
-		categorical_features_info.put(7, supgroup_to_int_map.size());
+		categorical_features_info.put(0, crime_type_to_int_map.size());
+		categorical_features_info.put(1, month_to_int_map.size());
+		categorical_features_info.put(2, supgroup_to_int_map.size());
+		categorical_features_info.put(3, group_to_int_map.size());
+		categorical_features_info.put(4, subgroup_to_int_map.size());
+		//categorical_features_info.put(1, lat_to_int_map.size());
+		//categorical_features_info.put(2, loc_to_int_map.size());
+		//categorical_features_info.put(3, lon_to_int_map.size());
+		//categorical_features_info.put(4, lsoa_to_int_map.size());
 
 		//algoritmo per il calcolo dell impurità accettabile per una partizione delle features, quando si deve costruire l'albero
 		String impurity_metric = "gini";
 		//+ profondo->più preciso MA rischio overfitting
 		Integer max_depth = 9;
 		//numero massimo di intervalli in cui dividere (discretizzare) i dati continui
-		Integer max_discretization_bins = 7000;
+		Integer max_discretization_bins = 50000;
 
 		//costruisce l'albero di decisione con i parametri settati
 		DecisionTreeModel decision_tree_model = DecisionTree.trainClassifier(training_set, num_classes, categorical_features_info, impurity_metric, max_depth, max_discretization_bins);
@@ -256,7 +261,12 @@ public class MachineLearning {
 						}).count() / test_set.count();
 
 		// Save model
-		decision_tree_model.save(sc.sc(), path_to_output_dir);
+		//decision_tree_model.save(sc.sc(), path_to_output_dir);
+		List<String> list=new ArrayList<String>();
+		list.add(decision_tree_model.toDebugString());
+		list.add("zio porcone");
+		JavaRDD<String> model=sc.parallelize(list);
+		model.saveAsTextFile(path_to_output_dir);
 
 
 	}//end decision_tree

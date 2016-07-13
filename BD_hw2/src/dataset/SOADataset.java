@@ -217,7 +217,7 @@ public class SOADataset {
 		});
 
 		/***JOIN BACK***/
-		//<String, Tuple6> lsao, regions, groups
+		//<String, Tuple6>
 		JavaPairRDD<String, Tuple6<String, String, String, String, String, String>> join_with_groups;
 		join_with_groups = invarianti.join(top_groups).mapToPair(new PairFunction<Tuple2<String,Tuple2<Tuple3<String,String,String>,Tuple3<String,String,String>>>, String, Tuple6<String, String, String, String, String, String>>() {
 			@Override
@@ -231,6 +231,8 @@ public class SOADataset {
 		});
 
 		/**flat finale delle tuple**/
+		//1			2			3				4				5			6		7
+		//lsao_code lsoa_name	region_code		region_name		supergroup	group	subgroup
 		JavaRDD<String> flatted;
 		flatted = join_with_groups.flatMap(new FlatMapFunction<Tuple2<String,Tuple6<String,String,String,String,String,String>>, String>() {
 			@Override
@@ -246,22 +248,13 @@ public class SOADataset {
 				//					comp+="\""+list.get(i)+"\", ";
 				//				comp+="\""+list.get(i)+"\"";
 				for(i=0; i<list.size()-1; i++)
-					comp+=list.get(i)+", ";
+					comp+=list.get(i)+",";
 				comp+=list.get(i);
 				ans.add(comp);
 				return ans;
 			}
 		});
-		//		//OUTPUT oa_categorie
-		//		OA_class_couples.saveAsTextFile(path_to_output_dir1);
-		//		//OUTPUT OA ed SOA
-		//		OA_to_SOA_couples.saveAsTextFile(path_to_output_dir2);
-		//		//tutti i gruppi contati
-		//		grouped.saveAsTextFile(path_to_output_dir3);
-		//		//raggrupati dopo join
-		//		top_groups.saveAsTextFile(path_to_output_dir4);
-		//		//rappresentazione pulita
-		flatted.coalesce(1);
+		flatted = flatted.coalesce(1);
 		flatted.saveAsTextFile(path_to_output_dir);
 		//chiude il contesto
 		sc.close();
