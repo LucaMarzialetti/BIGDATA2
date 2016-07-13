@@ -44,27 +44,29 @@ public class SOADataset {
 	}
 
 	// Load the data from CSVs
-	public static JavaRDD<String> loadData(String path) { 
+	public static JavaRDD<String> loadData(String path, boolean header) { 
 		// create spark configuration and spark context
 		//conf.setMaster("local[*]");
 		//sc.addJar("MBA.jar");
 		JavaRDD<String> rdd = sc.textFile(path);
-		rdd.mapPartitionsWithIndex(new Function2<Integer, Iterator<String>, Iterator<String>>() {
-			/**
-			 * 
-			 */
-			private static final long serialVersionUID = 1L;
+		if(header){
+			rdd.mapPartitionsWithIndex(new Function2<Integer, Iterator<String>, Iterator<String>>() {
+				/**
+				 * 
+				 */
+				private static final long serialVersionUID = 1L;
 
-			@Override
-			public Iterator<String> call(Integer ind, Iterator<String> iterator) throws Exception {
-				if(ind==0 && iterator.hasNext()){
-					iterator.next();
-					return iterator;
+				@Override
+				public Iterator<String> call(Integer ind, Iterator<String> iterator) throws Exception {
+					if(ind==0 && iterator.hasNext()){
+						iterator.next();
+						return iterator;
+					}
+					else
+						return iterator;
 				}
-				else
-					return iterator;
-			}
-		},false);
+			},false);
+		}
 		return rdd;
 	}
 
@@ -73,8 +75,8 @@ public class SOADataset {
 	@SuppressWarnings("serial")
 	public static void OA_to_SOA_job() {
 		//load data
-		JavaRDD<String> OA_class_text = loadData(path_to_dataset1);
-		JavaRDD<String> OA_to_SOA_text = loadData(path_to_dataset2);
+		JavaRDD<String> OA_class_text = loadData(path_to_dataset1, true);
+		JavaRDD<String> OA_to_SOA_text = loadData(path_to_dataset2, true);
 		/**MAPPING**/
 		// mappa OA_class in <String,Tuple8<String>>
 		JavaPairRDD<String,Tuple8<String, String, String, String, String, String, String, String>> OA_class_couples;
@@ -240,9 +242,9 @@ public class SOADataset {
 				list.addAll(Arrays.asList(t.toString().replaceAll("[()]", "").split(",",-1)));
 				int i;
 				//con virgolette
-//				for(i=0; i<list.size()-1; i++)
-//					comp+="\""+list.get(i)+"\", ";
-//				comp+="\""+list.get(i)+"\"";
+				//				for(i=0; i<list.size()-1; i++)
+				//					comp+="\""+list.get(i)+"\", ";
+				//				comp+="\""+list.get(i)+"\"";
 				for(i=0; i<list.size()-1; i++)
 					comp+=list.get(i)+", ";
 				comp+=list.get(i);
@@ -259,6 +261,7 @@ public class SOADataset {
 		//		//raggrupati dopo join
 		//		top_groups.saveAsTextFile(path_to_output_dir4);
 		//		//rappresentazione pulita
+		flatted.coalesce(1);
 		flatted.saveAsTextFile(path_to_output_dir);
 		//chiude il contesto
 		sc.close();

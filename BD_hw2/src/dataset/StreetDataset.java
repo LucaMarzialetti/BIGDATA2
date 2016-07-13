@@ -1,6 +1,7 @@
 package dataset;
 
 import java.util.Arrays;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -10,6 +11,7 @@ import org.apache.spark.api.java.JavaPairRDD;
 import org.apache.spark.api.java.JavaRDD;
 import org.apache.spark.api.java.JavaSparkContext;
 import org.apache.spark.api.java.function.FlatMapFunction;
+import org.apache.spark.api.java.function.Function2;
 import org.apache.spark.api.java.function.PairFunction;
 
 import scala.Tuple2;
@@ -38,11 +40,29 @@ public class StreetDataset {
 	}
 
 	// Load the data from CSVs
-	public static JavaRDD<String> loadData(String path) { 
+	public static JavaRDD<String> loadData(String path, boolean header) { 
 		// create spark configuration and spark context
 		//conf.setMaster("local[*]");
 		//sc.addJar("MBA.jar");
 		JavaRDD<String> rdd = sc.textFile(path);
+		if(header){
+			rdd.mapPartitionsWithIndex(new Function2<Integer, Iterator<String>, Iterator<String>>() {
+				/**
+				 * 
+				 */
+				private static final long serialVersionUID = 1L;
+
+				@Override
+				public Iterator<String> call(Integer ind, Iterator<String> iterator) throws Exception {
+					if(ind==0 && iterator.hasNext()){
+						iterator.next();
+						return iterator;
+					}
+					else
+						return iterator;
+				}
+			},false);
+		}
 		return rdd;
 	}
 
@@ -51,8 +71,8 @@ public class StreetDataset {
 	@SuppressWarnings("serial")
 	public static void OA_to_SOA_job() {
 		//load data
-		JavaRDD<String> SOA_sg = loadData(path_to_dataset1);
-		JavaRDD<String> street = loadData(path_to_dataset2);
+		JavaRDD<String> SOA_sg = loadData(path_to_dataset1, false);
+		JavaRDD<String> street = loadData(path_to_dataset2, true);
 		/**MAPPING**/
 		//mapping di soa_sg
 		JavaPairRDD<Tuple2<String, String>, Tuple3<String, String, String>> SOA_sg_couples;
@@ -114,7 +134,7 @@ public class StreetDataset {
 			@Override
 			public Tuple2<Tuple2<String, String>, Tuple5<String, String, String, String, String>> call(
 					Tuple2<Tuple2<String, String>, Tuple2<Tuple3<String, String, String>, Tuple2<String, String>>> t)
-					throws Exception {
+							throws Exception {
 				Tuple2<String, String> k = t._1;
 				Tuple5<String,String,String,String,String> v = new Tuple5<String, String, String, String, String>(t._2._1._1(), t._2._1._2(), t._2._1._3(), t._2._2._1(), t._2._2._2());
 				return new Tuple2<Tuple2<String,String>, Tuple5<String,String,String,String,String>>(k, v);
@@ -138,6 +158,9 @@ public class StreetDataset {
 				return ans;
 			}
 		});	
+		flatted.coalesce(1);
 		flatted.saveAsTextFile(path_to_output_dir);
+		//chiude il contesto
+		sc.close();
 	}
 }

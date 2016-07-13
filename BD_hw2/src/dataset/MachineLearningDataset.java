@@ -2,6 +2,7 @@ package dataset;
 
 import java.io.File;
 import java.util.Arrays;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -11,6 +12,7 @@ import org.apache.spark.api.java.JavaPairRDD;
 import org.apache.spark.api.java.JavaRDD;
 import org.apache.spark.api.java.JavaSparkContext;
 import org.apache.spark.api.java.function.FlatMapFunction;
+import org.apache.spark.api.java.function.Function2;
 import org.apache.spark.api.java.function.PairFunction;
 
 import scala.Tuple2;
@@ -40,32 +42,50 @@ public class MachineLearningDataset {
 	}
 
 	// Load the data from CSVs
-	public static JavaRDD<String> loadData(String path) { 
+	public static JavaRDD<String> loadData(String path, boolean header) { 
 		// create spark configuration and spark context
 		//conf.setMaster("local[*]");
 		//sc.addJar("MBA.jar");
 		JavaRDD<String> rdd = sc.textFile(path);
+		if(header){
+			rdd.mapPartitionsWithIndex(new Function2<Integer, Iterator<String>, Iterator<String>>() {
+				/**
+				 * 
+				 */
+				private static final long serialVersionUID = 1L;
+
+				@Override
+				public Iterator<String> call(Integer ind, Iterator<String> iterator) throws Exception {
+					if(ind==0 && iterator.hasNext()){
+						iterator.next();
+						return iterator;
+					}
+					else
+						return iterator;
+				}
+			},false);
+		}
 		return rdd;
 	}
-	
-	public static JavaRDD<String> loadNestedData(String path) {
+
+	public static JavaRDD<String> loadNestedData(String path, boolean header) {
 		File file = new File(path);
 		JavaRDD<String> merged = sc.emptyRDD();
 		String[] names = file.list();
 		for(String name : names){
-			JavaRDD<String> tmp = loadData(path+"/"+name);
+			JavaRDD<String> tmp = loadData(path+"/"+name, header);
 			merged = merged.union(tmp);
 		}
 		return merged;
 	}
-	
+
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	/**map oa and social groups to soa**/
 	@SuppressWarnings("serial")
 	public static void OA_to_SOA_job() {
 		//load data
-		JavaRDD<String> SOA_sg = loadData(path_to_dataset1);
-		JavaRDD<String> street = loadNestedData(path_to_dataset2);
+		JavaRDD<String> SOA_sg = loadData(path_to_dataset1, false);
+		JavaRDD<String> street = loadNestedData(path_to_dataset2, true);
 		/**MAPPING**/
 		//mapping di soa_sg
 		JavaPairRDD<Tuple2<String, String>, Tuple3<String, String, String>> SOA_sg_couples;
@@ -157,6 +177,10 @@ public class MachineLearningDataset {
 				return ans;
 			}
 		});	
+		flatted.coalesce(1);
 		flatted.saveAsTextFile(path_to_output_dir);
+		//chiude il contesto
+		sc.close();
+
 	}
 }
