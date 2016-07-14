@@ -36,7 +36,7 @@ public class StopSearchSex {
 		}
 		path_to_dataset=args[0];		//stop-and-search
 		path_to_output_dir=args[1];		//sex
-		String appName = "StopAndSearchSex";
+		String appName = "StopAndSearchSex_Job";
 		conf = new SparkConf().setAppName(appName);
 		sc = new JavaSparkContext(conf);
 		stop_search_sexism();
@@ -162,8 +162,8 @@ public class StopSearchSex {
 		//gender_searches_split_key_grouped_ordered.cache();
 		//FINAL
 		/**flat finale delle tuple**/
-		//1			2			3				4				5			6		7			8
-		//
+		//1			2		3		4				5			6				7				8
+		//gender 	age		hour	[obj_of_search	outcome		outcome_linked	cloth_removal	freq]
 		JavaRDD<String> flatted;
 		flatted = gender_searches_split_key_grouped_ordered.flatMap(new FlatMapFunction<Tuple2<Tuple3<String,String,String>,Iterable<Tuple5<String,String,String,String,Integer>>>, String>() {
 

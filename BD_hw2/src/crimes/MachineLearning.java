@@ -42,7 +42,7 @@ public class MachineLearning {
 
 		path_to_dataset=args[0];		//ml_dataset
 		path_to_output_dir=args[1];	
-		String appName = "MLearning";
+		String appName = "MLearning_Job";
 		conf = new SparkConf().setAppName(appName);
 		sc = new JavaSparkContext(conf);
 		decision_tree();

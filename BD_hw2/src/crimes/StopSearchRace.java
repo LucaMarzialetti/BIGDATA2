@@ -34,7 +34,7 @@ public class StopSearchRace {
 		}
 		path_to_dataset=args[0];		//stop-and-search
 		path_to_output_dir=args[1];		//racism
-		String appName = "StopAndSearchRace";
+		String appName = "StopAndSearchRace_Job";
 		conf = new SparkConf().setAppName(appName);
 		sc = new JavaSparkContext(conf);
 		stop_search_racism();
@@ -135,8 +135,8 @@ public class StopSearchRace {
 						});
 
 		/**flat finale delle tuple**/
-		//1			2			3				4				5			6
-		//
+		//1				2		3				4			5				6
+		//ethnicity 	age		[obj_of_search	outcome		outcome_linked	freq]
 		JavaRDD<String> flatted;
 		flatted = ethnicity_searches_frequencies_ordered.flatMap(new FlatMapFunction<Tuple2<Tuple2<String,String>,Iterable<Tuple4<String,String,String,Integer>>>, String>() {
 

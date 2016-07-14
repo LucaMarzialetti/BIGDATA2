@@ -32,10 +32,10 @@ public class StreetDataset {
 		path_to_dataset1=args[0];		//soag
 		path_to_dataset2=args[1];		//street
 		path_to_output_dir=args[2];
-		String appName = "Dataset";
+		String appName = "Street_Dataset";
 		conf = new SparkConf().setAppName(appName);
 		sc = new JavaSparkContext(conf);
-		OA_to_SOA_job();
+		Street_dataset_job();
 		sc.close();
 	}
 
@@ -80,7 +80,7 @@ public class StreetDataset {
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	/**map oa and social groups to soa**/
 	@SuppressWarnings("serial")
-	public static void OA_to_SOA_job() {
+	public static void Street_dataset_job() {
 		//load data
 		JavaRDD<String> SOA_sg = loadData(path_to_dataset1, false);
 		JavaRDD<String> street = loadNestedData(path_to_dataset2, true);

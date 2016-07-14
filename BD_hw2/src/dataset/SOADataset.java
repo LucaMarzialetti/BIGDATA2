@@ -37,10 +37,10 @@ public class SOADataset {
 		path_to_dataset1=args[0];//OA_class
 		path_to_dataset2=args[1];//OA_to_SOA
 		path_to_output_dir=args[2];
-		String appName = "SOA_social_groups";
+		String appName = "SOA_Dataset_Job";
 		conf = new SparkConf().setAppName(appName);
 		sc = new JavaSparkContext(conf);
-		OA_to_SOA_job();
+		SOA_dataset_job();
 		sc.close();
 	}
 
@@ -74,7 +74,7 @@ public class SOADataset {
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	/**map oa and social groups to soa**/
 	@SuppressWarnings("serial")
-	public static void OA_to_SOA_job() {
+	public static void SOA_dataset_job() {
 		//load data
 		JavaRDD<String> OA_class_text = loadData(path_to_dataset1, true);
 		JavaRDD<String> OA_to_SOA_text = loadData(path_to_dataset2, true);

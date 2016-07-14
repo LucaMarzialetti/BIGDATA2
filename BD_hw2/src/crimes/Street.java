@@ -4,12 +4,14 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
 
 import org.apache.spark.SparkConf;
 import org.apache.spark.api.java.JavaPairRDD;
 import org.apache.spark.api.java.JavaRDD;
 import org.apache.spark.api.java.JavaSparkContext;
+import org.apache.spark.api.java.function.FlatMapFunction;
 import org.apache.spark.api.java.function.Function;
 import org.apache.spark.api.java.function.Function2;
 import org.apache.spark.api.java.function.PairFunction;
@@ -32,7 +34,7 @@ public class Street {
 			System.exit(1);}
 		path_to_dataset=args[0];		//street
 		path_to_output_dir=args[1];		//crime_freq
-		String appName = "Street";
+		String appName = "Street_Job";
 		conf = new SparkConf().setAppName(appName);
 		sc = new JavaSparkContext(conf);
 		crime_frequency_by_lsoa();
@@ -128,35 +130,35 @@ public class Street {
 							}
 						});
 		/**flat finale delle tuple**/
-		//1			2			3				4				5			6		7		8
-		//
-//		JavaRDD<String> flatted;
-//		flatted = lsoa_and_group_as_key_grouped_ordered.flatMap(new FlatMapFunction<Tuple2<Tuple5<String,String,String,String,String>,Iterable<Tuple3<String,String,Integer>>>, String>() {
-//
-//			@Override
-//			public Iterable<String> call(
-//					Tuple2<Tuple5<String, String, String, String, String>, Iterable<Tuple3<String, String, Integer>>> t)
-//					throws Exception {
-//				LinkedList<String> list = new LinkedList<String>();
-//				LinkedList<String> ans = new LinkedList<String>();
-//				String comp ="";
-//				list.addAll(Arrays.asList(t.toString().replaceAll("[()]", "").split(",",-1)));
-//				int i;
-//				//con virgolette
-//				//				for(i=0; i<list.size()-1; i++)
-//				//					comp+="\""+list.get(i)+"\", ";
-//				//				comp+="\""+list.get(i)+"\"";
-//				for(i=0; i<list.size()-1; i++)
-//					comp+=list.get(i)+",";
-//				comp+=list.get(i);
-//				ans.add(comp);
-//				return ans;
-//			}
-//		});
-//		flatted = flatted.coalesce(1);
-//		flatted.saveAsTextFile(path_to_output_dir);	
-		lsoa_and_group_as_key_grouped_ordered = lsoa_and_group_as_key_grouped_ordered.coalesce(1);
-		lsoa_and_group_as_key_grouped_ordered.saveAsTextFile(path_to_output_dir);
+		//1				2			3				4		5			6				7			8
+		//lsoa_code		lsoa_name	supergroup		group	subgroup	[crime_type 	outcome 	freq]
+		JavaRDD<String> flatted;
+		flatted = lsoa_and_group_as_key_grouped_ordered.flatMap(new FlatMapFunction<Tuple2<Tuple5<String,String,String,String,String>,Iterable<Tuple3<String,String,Integer>>>, String>() {
+
+			@Override
+			public Iterable<String> call(
+					Tuple2<Tuple5<String, String, String, String, String>, Iterable<Tuple3<String, String, Integer>>> t)
+					throws Exception {
+				LinkedList<String> list = new LinkedList<String>();
+				LinkedList<String> ans = new LinkedList<String>();
+				String comp ="";
+				list.addAll(Arrays.asList(t.toString().replaceAll("[()]", "").split(",",-1)));
+				int i;
+				//con virgolette
+				//				for(i=0; i<list.size()-1; i++)
+				//					comp+="\""+list.get(i)+"\", ";
+				//				comp+="\""+list.get(i)+"\"";
+				for(i=0; i<list.size()-1; i++)
+					comp+=list.get(i)+",";
+				comp+=list.get(i);
+				ans.add(comp);
+				return ans;
+			}
+		});
+		flatted = flatted.coalesce(1);
+		flatted.saveAsTextFile(path_to_output_dir);	
+//		lsoa_and_group_as_key_grouped_ordered = lsoa_and_group_as_key_grouped_ordered.coalesce(1);
+//		lsoa_and_group_as_key_grouped_ordered.saveAsTextFile(path_to_output_dir);
 	}//end class
 
 }//end App
