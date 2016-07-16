@@ -288,7 +288,6 @@ public class MachineLearning {
 		//decision_tree_model.save(sc.sc(), path_to_output_dir);
 		List<String> list=new ArrayList<String>();
 		list.add(decision_tree_model.toDebugString());
-		list.add("zio porcone");
 		JavaRDD<String> model=sc.parallelize(list);
 		model.saveAsTextFile(path_to_output_dir);
 	}//end decision_tree
