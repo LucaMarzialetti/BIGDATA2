@@ -1,7 +1,5 @@
 package dataset;
 
-import java.util.regex.Pattern;
-
 public class TestSplit {
 	public static void main(String[] args) {
 //		String str = "2016-01-02T16:45:00+00:00";
